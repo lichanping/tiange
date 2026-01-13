@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>🎵 随机抽取歌单歌曲</title>
+    <link rel="stylesheet" href="song.css">
+    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<h1>🎧 歌单随机抽取工具</h1>
+<div class="container">
+    <div class="file-input-container">
+        <input type="file" id="excelFile" accept=".xlsx,.xls">
+        <!-- 💰 新增金额输入框 -->
+        <input type="number" id="moneyInput" step="0.1" min="0" value="0" style="width: 100px; margin-left: 10px;"
+               placeholder="金额 (如 0.3)">
+    </div>
+
+    <div class="controls-container">
+        <input type="number" id="songCount" placeholder="输入要抽取的歌曲数量 (如 10)" value="10">
+        <select id="sheetSelect">
+            <option value="">请选择工作表</option>
+        </select>
+    </div>
+
+    <div class="buttons-container">
+        <button id="getSongsBtn">随机抽取</button>
+        <button id="supplementSongsBtn">补充抽取</button>
+        <button id="generateSentenceBtn" disabled>生成文案</button>
+    </div>
+
+    <h3>🎶 抽取结果：</h3>
+    <ul id="songList"></ul>
+    <div id="sheetInfo" class="sheet-info"></div>
+</div>
+
+<script src="song.js"></script>
+</body>
+</html>

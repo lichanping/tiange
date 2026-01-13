@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="player.css">
+</head>
+<body>
+<!-- 背景层 -->
+<div id="bg"></div>
+
+
+<!-- 播放页 -->
+<section id="player-view" class="view active">
+    <div class="player-stage">
+        <!-- 大封面 -->
+        <div class="cover-wrap">
+            <img id="current-cover" src="" alt="专辑封面">
+        </div>
+
+        <!-- 歌曲信息 -->
+        <div class="meta">
+            <h2 id="song-title">歌名</h2>
+            <div class="singer-label">
+                <p id="song-singer">歌手</p>
+                <span id="yueyin-label">悦音</span>
+                <span id="vip-label">VIP</span> <!-- 新增VIP标签 -->
+            </div>
+        </div>
+
+        <!-- 播放控制区（已移除音量条） -->
+        <div class="controls">
+            <div class="time">
+                <span id="current-time">00:00</span>
+                <input id="progress" type="range" min="0" max="100" step="1" value="0" aria-label="进度条">
+                <span id="total-time">00:00</span>
+            </div>
+            <div class="controls-row">
+                <div class="buttons">
+                    <button id="mode" aria-label="播放模式">循环</button>
+                    <button id="prev" aria-label="上一首">⟨</button>
+                    <button id="play-pause" aria-label="播放/暂停">▶</button>
+                    <button id="next" aria-label="下一首">⟩</button>
+                </div>
+                <div class="index-controls collapsed" id="index-controls">
+                    <button id="toggle-index-controls" aria-label="展开/折叠">⟨</button>
+                    <div class="index-content">
+                        <input type="number" id="song-index" min="1" value="1" placeholder="序号">
+                        <button id="switch-song">切换</button>
+                        <span id="total-count">/ 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="player.js"></script>
+</body>
+</html>
