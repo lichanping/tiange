@@ -1,0 +1,413 @@
+/* 基础布局与视图切换 */
+:root {
+    color-scheme: light dark;
+    --bg: #0b0b0d;
+    --fg: #ffffff;
+    --muted: #cfcfd6;
+    --accent: #4f8cff;
+    --card: rgba(255, 255, 255, 0.08);
+    --blur: 16px;
+    /* 更亮的歌手文字色（接近白色） */
+    --singer-color: #f5f5f7;
+    /* 爱心符号颜色（粉色系，更醒目） */
+    --heart-color: #ff69b4;
+    /* 统一按钮高度变量 */
+    --btn-height: 24px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+}
+
+/* 背景显示 */
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/studyEN/songPlayer/images/骗我.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(var(--blur)) brightness(0.85);
+    transform: scale(1.05);
+    opacity: 1; /* 直接设置为可见 */
+    pointer-events: none;
+    z-index: 0;
+}
+
+.view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+    opacity: 1;
+    z-index: 2; /* 高于雪花 */
+}
+
+/* 索引切换控制 - 核心调整：与播放按钮高度一致 */
+.index-controls {
+  position: static;
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  transition: width 0.3s, min-width 0.3s;
+  overflow: hidden;
+  min-width: 180px;
+  width: auto;
+  z-index: 10;
+  /* 核心：与播放按钮高度统一 */
+  height: var(--btn-height);
+}
+
+.index-controls:hover {
+    opacity: 1;
+}
+
+#song-index {
+    width: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: var(--fg);
+    padding: 0 8px; /* 垂直padding清零，靠height撑高度 */
+    font-size: 14px;
+    text-align: center;
+    /* 与容器高度一致 */
+    height: calc(var(--btn-height) - 4px);
+    line-height: calc(var(--btn-height) - 4px);
+}
+
+#switch-song {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    padding: 0 12px; /* 垂直padding清零，靠height撑高度 */
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    /* 与容器高度一致 */
+    height: calc(var(--btn-height) - 4px);
+    line-height: calc(var(--btn-height) - 4px);
+}
+
+#switch-song:hover {
+    background: #3a7cff;
+}
+
+#total-count {
+    font-size: 14px;
+    color: var(--muted);
+    min-width: 30px;
+    line-height: var(--btn-height);
+}
+
+/* 折叠/展开按钮样式统一 */
+.index-controls button#toggle-index-controls {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 8px; /* 垂直padding清零 */
+  color: var(--fg);
+  transition: transform 0.3s, background 0.2s ease;
+  border-radius: 4px;
+  /* 与容器高度一致 */
+  height: var(--btn-height);
+  line-height: var(--btn-height);
+}
+
+.index-controls button#toggle-index-controls:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.index-controls .index-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.3s;
+  height: 100%; /* 继承父容器高度 */
+  padding: 0 4px;
+}
+
+.index-controls.collapsed {
+  min-width: calc(var(--btn-height));
+  width: calc(var(--btn-height));
+}
+
+.index-controls.collapsed .index-content {
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  margin: 0;
+}
+
+.index-controls.collapsed button#toggle-index-controls {
+  transform: rotate(180deg);
+}
+
+/* 播放页 */
+.player-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    z-index: 3; /* 确保播放器在最上层 */
+}
+
+.cover-wrap {
+    width: min(72vw, 360px);
+    height: min(72vw, 360px);
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    background-color: #111;
+    position: relative;
+    margin-top: 15px; /* 新增：整体下移10px */
+    margin-bottom: 20px;
+}
+
+.cover-wrap::before {
+    content: '♪';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    color: #333;
+    z-index: 1;
+    opacity: 0.3;
+}
+
+#current-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 2;
+}
+
+.cover-rotating {
+    animation: slow-rotate 24s linear infinite;
+}
+
+@keyframes slow-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.meta {
+    text-align: center;
+    margin: 20px 0 30px;
+    z-index: 2;
+}
+
+#song-title {
+    font-size: 24px;
+    margin: 0 0 12px 0; /* 增加底部外边距 12px，可根据需要调整数值 */
+    font-weight: 600;
+}
+
+/* 歌手名称容器：整合爱心+歌手名+悦音标签的排版 */
+.singer-label {
+    display: flex;
+    flex-direction: row;      /* 横向排列 */
+    align-items: center;      /* 垂直居中 */
+    justify-content: center;  /* 水平居中 */
+    gap: 4px;                 /* 缩小间距，让爱心和文字更紧凑 */
+}
+
+/* 歌手名称样式（包含爱心） */
+#song-singer {
+    font-size: 16px;
+    margin: 0;
+    line-height: 1;
+    color: var(--singer-color);
+    display: inline-flex;     /* 改为inline-flex，兼容爱心和文字同行 */
+    align-items: center;
+    gap: 4px;                 /* 爱心和歌手名的间距 */
+}
+
+/* 爱心符号样式（可单独控制） */
+#song-singer::before {
+    content: '💗';            /* 爱心符号 */
+    color: var(--heart-color);/* 自定义爱心颜色 */
+    font-size: 14px;          /* 爱心字号略小于歌手名，更协调 */
+    display: inline-block;
+}
+
+.controls {
+    width: 100%;
+    max-width: 560px;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    z-index: 2;
+}
+
+.time {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+}
+
+#progress {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+#progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+/* 核心修改：播放按钮高度减半 + 统一高度 */
+.buttons button {
+    appearance: none;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--fg);
+    padding: 0 12px; /* 垂直padding清零，靠height控制高度 */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    /* 核心：高度减半且与索引控制区统一 */
+    height: var(--btn-height);
+    line-height: var(--btn-height); /* 文字垂直居中 */
+}
+
+.buttons button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.buttons button:active {
+    transform: scale(0.95);
+}
+
+#play-pause {
+    background: var(--accent);
+    color: white;
+}
+
+#play-pause:hover {
+    background: #3a7cff;
+}
+
+.volume {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+#volume {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+#volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+}
+
+/* 触控优化 */
+button, input[type="range"] {
+    touch-action: manipulation;
+}
+
+/* 背景显示 */
+#player-view.active ~ #bg {
+    opacity: 1;
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+/* 悦音标签样式（保留原有，无需修改） */
+#yueyin-label,#vip-label {
+    display: inline-block;
+    background: #fffbe6;
+    color: #bfa100;
+    font-size: 0.78em;
+    padding: 1px 7px;
+    border-radius: 10px;
+    border: 1px solid #ffe066;
+    margin-left: 2px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    line-height: 1;
+    vertical-align: middle;
+    position: relative;
+    top: 1px;
+}
+
+/* 微调歌手标签容器间距（可选，让三个元素更紧凑） */
+.singer-label {
+    gap: 4px !important; /* 覆盖原有gap，爱心/歌手名/悦音/VIP间距统一为4px */
+}
