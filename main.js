@@ -3,7 +3,8 @@
   const routes = {
     // 使用 songPlayer 中的播放器页面
     player: 'songPlayer/player.html',
-    recommend: 'recommend.html',
+    // 直接进入推荐工具页面
+    recommend: 'recommend/song.html',
     learning: 'learning.html',
   };
 
