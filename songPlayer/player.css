@@ -37,7 +37,7 @@ html, body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url('/studyEN/songPlayer/images/骗我.png');
+    background-image: url('./images/default.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -410,4 +410,34 @@ button, input[type="range"] {
 /* 微调歌手标签容器间距（可选，让三个元素更紧凑） */
 .singer-label {
     gap: 4px !important; /* 覆盖原有gap，爱心/歌手名/悦音/VIP间距统一为4px */
+}
+
+/* 返回按钮 - 左上角固定定位（默认在 HTML 里隐藏，需要时用 JS 显示） */
+.back-btn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 9999;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--fg);
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.back-btn:active {
+  transform: translateY(1px);
+}
+
+/* 安全区域适配（刘海/圆角屏） */
+@supports (padding: max(0px)) {
+  .back-btn {
+    top: calc(16px + env(safe-area-inset-top));
+    left: calc(16px + env(safe-area-inset-left));
+  }
 }
